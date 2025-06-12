@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter - Real-time Exchange Rates</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="app-title">💱 Currency Converter</h1>
+                    <div class="header-actions">
+                        <div class="rate-update-indicator">
+                            <span class="status-dot"></span>
+                            <span class="update-text">Live rates</span>
+                        </div>
+                        <button class="btn btn--secondary btn--sm theme-toggle" title="Toggle theme">
+                            🌙
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <nav class="tab-navigation">
+                    <button class="tab-btn active" data-tab="converter">
+                        💰 Converter
+                    </button>
+                    <button class="tab-btn" data-tab="rates">
+                        📊 Live Rates
+                    </button>
+                    <button class="tab-btn" data-tab="history">
+                        📋 History
+                    </button>
+                    <button class="tab-btn" data-tab="favorites">
+                        ⭐ Favorites
+                    </button>
+                </nav>
+
+                <div class="tab-content active" id="converter-tab">
+                    <div class="converter-layout">
+                        <div class="card converter-card">
+                            <div class="card__body">
+                                <form class="converter-form" id="converter-form">
+                                    <div class="form-group">
+                                        <label class="form-label" for="amount">Amount</label>
+                                        <input 
+                                            type="number" 
+                                            id="amount" 
+                                            class="form-control amount-input" 
+                                            placeholder="Enter amount"
+                                            min="0"
+                                            step="0.01"
+                                            value="100"
+                                        >
+                                    </div>
+
+                                    <div class="currency-section">
+                                        <div class="currency-group">
+                                            <label class="form-label">From</label>
+                                            <div class="currency-select-wrapper">
+                                                <select id="from-currency" class="form-control currency-select">
+                                                    <option value="USD">🇺🇸 USD - US Dollar</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" class="swap-btn" title="Swap currencies">
+                                            ⇄
+                                        </button>
+
+                                        <div class="currency-group">
+                                            <label class="form-label">To</label>
+                                            <div class="currency-select-wrapper">
+                                                <select id="to-currency" class="form-control currency-select">
+                                                    <option value="EUR">🇪🇺 EUR - Euro</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="conversion-result">
+                                        <div class="result-display">
+                                            <div class="converted-amount">
+                                                <span class="amount-value" id="converted-amount">85.00</span>
+                                                <span class="currency-code" id="result-currency">EUR</span>
+                                            </div>
+                                            <div class="exchange-rate">
+                                                <span id="exchange-rate-text">1 USD = 0.85 EUR</span>
+                                                <span class="rate-change" id="rate-change">+0.02%</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn--outline add-favorite" title="Add to favorites">
+                                            ⭐
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card chart-card">
+                            <div class="card__body">
+                                <h3>Exchange Rate Trend (7 days)</h3>
+                                <div class="chart-container">
+                                    <canvas id="rate-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="rates-tab">
+                    <div class="card rates-card">
+                        <div class="card__body">
+                            <div class="rates-header">
+                                <h3>Live Exchange Rates</h3>
+                                <div class="rates-controls">
+                                    <select id="base-currency" class="form-control">
+                                        <option value="USD">Base: USD</option>
+                                    </select>
+                                    <input type="text" id="currency-search" class="form-control" placeholder="Search currencies...">
+                                </div>
+                            </div>
+                            <div class="rates-grid" id="rates-grid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="history-tab">
+                    <div class="card history-card">
+                        <div class="card__body">
+                            <div class="history-header">
+                                <h3>Conversion History</h3>
+                                <div class="history-actions">
+                                    <button class="btn btn--secondary btn--sm" id="clear-history">
+                                        🗑️ Clear
+                                    </button>
+                                    <button class="btn btn--primary btn--sm" id="export-history">
+                                        📥 Export
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="history-table-wrapper">
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Rate</th>
+                                            <th>Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="history-tbody">
+                                    </tbody>
+                                </table>
+                                <div class="empty-state" id="empty-history">
+                                    <p>No conversion history yet. Start converting currencies to see your history here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="favorites-tab">
+                    <div class="card favorites-card">
+                        <div class="card__body">
+                            <h3>Favorite Currency Pairs</h3>
+                            <div class="favorites-grid" id="favorites-grid">
+                                <div class="empty-state" id="empty-favorites">
+                                    <p>No favorite currency pairs yet. Add some from the converter to see them here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Updating exchange rates...</p>
+            </div>
+        </div>
+
+        <div class="toast-container" id="toast-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
